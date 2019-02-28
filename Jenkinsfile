@@ -1,10 +1,16 @@
+@Library('DaytraderLib')_
+def podTemplateYaml = libraryResource 'maven-kaniko.yaml'
+
 pipeline {
   agent {
-    label 'maven-kaniko'
+    kubernetes {
+      label 'maven-kaniko-pod'
+      yaml podTemplateYaml
+    }
   }
-  libraries {
-    lib('DaytraderLib')
-  }
+  //libraries {
+  //  lib('DaytraderLib')
+  //}
   stages {
     stage('build maven') {
         steps {
