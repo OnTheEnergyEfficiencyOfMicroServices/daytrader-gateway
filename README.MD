@@ -3,7 +3,7 @@
 
 The Gateway to the DayTrader business operations
 
-
+Edit
 
 ## Monolithic Architecture
 
