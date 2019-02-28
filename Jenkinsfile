@@ -33,19 +33,13 @@ spec:
 """
     }
   }
+  libraries {
+    lib('DaytraderLib')
+  }
   stages {
     stage('build maven') {
         steps {
-            container('maven') {
-                dir ('daytrader-gatewayapp') {
-                    sh 'mvn package -B -e -Dmaven.test.skip=true'
-                    //sh 'pwd'
-                    //sh 'ls -R | grep target'
-                }
-                //sh 'pwd'
-                //sh 'ls -la'
-                //sh 'ls -la daytrader-gatewayapp/daytrader-gateway/target'
-            }
+            mavenBuild('daytrader-gatewayapp')
         }
     }
         stage('Build with Kaniko') {
@@ -53,16 +47,14 @@ spec:
         PATH = "/busybox:/kaniko:$PATH"
       }
       steps {
-        container(name: 'kaniko', shell: '/busybox/sh') {
-            sh '''#!/busybox/sh
-            /kaniko/executor -v debug -f `pwd`/daytrader-gatewayapp/daytrader-gateway/Dockerfile -c `pwd`/daytrader-gatewayapp/daytrader-gateway --insecure --skip-tls-verify --destination=baserepodev.devrepo.malibu-pctn.com/104017-malibu-artifacts/daytrader-example-gatewayapp:latest \
-            --build-arg WAR_ARTIFACTID=daytrader-gateway \
-            --build-arg APP_VERSION=4.0.0 \
-            --build-arg APP_ARTIFACTID=daytrader-gatewayapp \
-            --build-arg EXPOSE_PORT=2443
-            '''
-            
-        }
+        kanikoBuild('kaniko',
+                    'daytrader-gatewayapp',
+                    'daytrader-gateway',
+                    'baserepodev.devrepo.malibu-pctn.com/104017-malibu-artifacts',
+                    'daytrader-example-gatewayapp',
+                    'latest',
+                    '4.0.0', 
+                    2443)
       }
     }
   }
